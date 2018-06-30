@@ -2,7 +2,7 @@
 const laoder = require("./sequelize-loader");
 const Sequelize = laoder.Sequelize;
 
-const User = laoder = laoder.database.define('users', {
+const User = laoder.database.define('users', {
   userId: {
     type: Sequelize.INTEGER,
     primaryKey: true,

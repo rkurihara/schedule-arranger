@@ -19,7 +19,7 @@ const Comment = loader.database.define('comments', {
   }
 }, {
     freezeTableName: true,
-    timestamps: false``
+    timestamps: false
   });
 
 module.exports = Comment;

@@ -22,7 +22,7 @@ const Candidate = loader.database.define('canditates', {
     timestamps: false,
     indexes: [
       {
-        fields: ['scheudleId']
+        fields: ['scheduleId']
       }
     ]
   });

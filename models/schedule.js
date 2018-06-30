@@ -6,7 +6,7 @@ const Schedule = loader.database.define('schedules', {
   scheudleId: {
     type: Sequelize.UUID,
     primaryKey: true,
-    allowNull: fasle
+    allowNull: false
   },
   scheduleName: {
     type: Sequelize.STRING,
