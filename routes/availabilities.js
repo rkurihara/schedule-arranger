@@ -6,7 +6,7 @@ const Availability = require('../models/availability');
 
 router.post('/:scheduleId/users/:userId/candidates/:candidateId', authenticationEnsure, (req, res, next) => {
   const scheduleId = req.params.scheduleId;
-  const userId = req.params.userId,
+  const userId = req.params.userId;
   const candidateId = req.params.candidateId;
   let availability = req.body.availability;
   availability = availability ? parseInt(availability) : 0;
