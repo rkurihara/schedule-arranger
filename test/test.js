@@ -2,11 +2,12 @@
 const request = require('supertest');
 const app = require('../app');
 const passportStub = require('passport-stub');
-let User = require('../models/user');
-let Schedule = require('../models/schedule');
-let Candidate = require('../models/candidate');
-let Availability = require('../models/availability');
+const User = require('../models/user');
+const Schedule = require('../models/schedule');
+const Candidate = require('../models/candidate');
+const Availability = require('../models/availability');
 const assert = require('assert');
+const Comment = require('../models/comment');
 
 describe('/login', () => {
   before(() => {
@@ -73,7 +74,7 @@ describe('/schedules', () => {
             .expect(/テスト候補3/)
             .expect(200)
             .end((err, res) => {
-              deleteScheduleAggregate(createdSchedulePath.split('/scheudles/')[1], done, err);
+              deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err);
             });
         });
     });
@@ -122,7 +123,49 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
   });
 });
 
+describe('/schedules/:scheduleId/users/:userId/comments', () => {
+  before(() => {
+    passportStub.install(app);
+    passportStub.login({ id: 0, username: 'testuser' });
+  });
+
+  after(() => {
+    passportStub.logout();
+    passportStub.uninstall(app);
+  });
+
+  it('コメントが更新できる', (done) => {
+    User.upsert({ userId: 0, username: 'testuser' }).then(() => {
+      request(app)
+        .post('/schedules')
+        .send({ scheduleName: 'テストコメント更新予定1', memo: 'テストコメント更新メモ1', candidates: 'テストコメント更新候補1' })
+        .end((err, res) => {
+          const createdSchedulePath = res.headers.location;
+          const scheduleId = createdSchedulePath.split('/schedules/')[1];
+          // 更新がされることをテスト
+          request(app)
+            .post(`/schedules/${scheduleId}/users/${0}/comments`)
+            .send({ comment: 'testcomment' })
+            .expect('{"status":"OK","comment":"testcomment"}')
+            .end((err, res) => {
+              Comment.findAll({
+                where: { scheduleId: scheduleId }
+              }).then((comments) => {
+                assert.equal(comments.length, 1);
+                assert.equal(comments[0].comment, 'testcomment');
+                deleteScheduleAggregate(scheduleId, done, err);
+              });
+            });
+        });
+    });
+  });
+});
+
 function deleteScheduleAggregate(scheduleId, done, err) {
+  const processCommentDestory = Comment.findAll({
+    where: { scheduleId: scheduleId }
+  }).then((comments) => { comments.map((c) => { return c.destroy(); }); });
+
   Availability.findAll({
     where: { scheduleId: scheduleId }
   }).then((availabilities) => {
