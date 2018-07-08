@@ -6,6 +6,7 @@ let User = require('../models/user');
 let Schedule = require('../models/schedule');
 let Candidate = require('../models/candidate');
 let Availability = require('../models/availability');
+const assert = require('assert');
 
 describe('/login', () => {
   before(() => {
@@ -106,7 +107,15 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
               .post(`/schedules/${scheduleId}/users/${0}/candidates/${candidate.candidateId}`)
               .send({ availability: 2 }) //出席に更新
               .expect('{"status":"OK","availability":2}')
-              .end((err, res) => { deleteScheduleAggregate(scheduleId, done, err); });
+              .end((err, res) => {
+                Availability.findAll({
+                  where: { scheduleId: scheduleId }
+                }).then((availabilities) => {
+                  assert(availabilities.length, 1);
+                  assert(availabilities[0].availability, 2);
+                  deleteScheduleAggregate(scheduleId, done, err);
+                });
+              });
           });
         });
     });
