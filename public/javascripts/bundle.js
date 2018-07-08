@@ -92,6 +92,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   });
 });
 
+var buttonSelfComment = (0, _jquery2.default)('#self-comment-button');
+buttonSelfComment.click(function () {
+  var scheduleId = buttonSelfComment.data('schedule-id');
+  var userId = buttonSelfComment.data('user-id');
+  var comment = prompt('コメントを255文字以内で入力してください。');
+  if (comment) {
+    _jquery2.default.post('/schedules/' + scheduleId + '/users/' + userId + '/comments', { comment: comment }, function (data) {
+      (0, _jquery2.default)('#self-comment').text(data.comment);
+    });
+  }
+});
+
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
