@@ -13,6 +13,7 @@
     "express": "~4.15.5",
     "express-session": "^1.13.0",
     "helmet": "^1.1.0",
+    "jquery": "^3.3.1",
     "morgan": "~1.9.0",
     "node-uuid": "^1.4.7",
     "passport": "^0.3.2",
@@ -24,8 +25,12 @@
     "serve-favicon": "~2.4.5"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
     "mocha": "^3.2.0",
     "passport-stub": "^1.1.1",
-    "supertest": "^1.2.0"
+    "supertest": "^1.2.0",
+    "webpack": "^3.10.0"
   }
 }
