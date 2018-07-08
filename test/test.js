@@ -164,8 +164,8 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
 function deleteScheduleAggregate(scheduleId, done, err) {
   const promiseCommentDestroy = Comment.findAll({
     where: { scheduleId: scheduleId }
-  }).then((comments) => { 
-    return Promise.all(comments.map((c) => { return c.destroy(); })); 
+  }).then((comments) => {
+    return Promise.all(comments.map((c) => { return c.destroy(); }));
   });
 
   Availability.findAll({
