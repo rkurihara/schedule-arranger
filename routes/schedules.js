@@ -130,5 +130,33 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   });
 });
 
+router.get('/:scheduleId/edit', authenticationEnsurer, (req, res, next) => {
+  Schedule.findOne({
+    where: {
+      scheduleId: req.params.scheduleId
+    }
+  }).then((schedule) => {
+    if (isMine(req, schedule)) {
+      Candidate.findAll({
+        where: { scheduleId: schedule.scheduleId },
+        order: '"candidateId" ASC'
+      }).then((candidates) => {
+        res.render('edit', {
+          user: req.user,
+          schedule: schedule,
+          candidates: candidates
+        });
+      });
+    } else {
+      const err = new Error('指定された予定がない、または、予定する権限がありません')
+      err.status = 404;
+      next(err);
+    }
+  });
+});
+
+function isMine(req, schedule) {
+  return schedule && parseInt(schedule.createdBy) === parseInt(req.user.id);
+}
 
 module.exports = router;
