@@ -8,6 +8,7 @@ const Candidate = require('../models/candidate');
 const Availability = require('../models/availability');
 const assert = require('assert');
 const Comment = require('../models/comment');
+const deleteScheduleAggregate = require('../routes/schedules').deleteScheduleAggregate;
 
 describe('/login', () => {
   before(() => {
@@ -161,32 +162,6 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
   });
 });
 
-function deleteScheduleAggregate(scheduleId, done, err) {
-  const promiseCommentDestroy = Comment.findAll({
-    where: { scheduleId: scheduleId }
-  }).then((comments) => {
-    return Promise.all(comments.map((c) => { return c.destroy(); }));
-  });
-
-  Availability.findAll({
-    where: { scheduleId: scheduleId }
-  }).then((availabilities) => {
-    const promises = availabilities.map((a) => { return a.destroy(); });
-    return Promise.all(promises);
-  }).then(() => {
-    return Candidate.findAll({
-      where: { scheduleId: scheduleId }
-    });
-  }).then((candidates) => {
-    const promises = candidates.map((c) => { return c.destroy(); });
-    promises.push(promiseCommentDestroy);
-  }).then(() => {
-    Schedule.findById(scheduleId).then((s) => { s.destroy(); });
-    if (err) return done(err);
-    done();
-  });
-}
-
 describe('/schedules/:scheduleId?edit=1', () => {
   before(() => {
     passportStub.install(app);
@@ -222,10 +197,9 @@ describe('/schedules/:scheduleId?edit=1', () => {
                 assert.equal(candidates[0].candidateName, 'テスト更新候補1');
                 assert.equal(candidates[1].candidateName, 'テスト更新候補2');
                 deleteScheduleAggregate(scheduleId, done, err);
-              })
-            })
-        })
-
-    })
-  })
-})
+              });
+            });
+        });
+    });
+  });
+});
