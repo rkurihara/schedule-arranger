@@ -186,3 +186,46 @@ function deleteScheduleAggregate(scheduleId, done, err) {
     done();
   });
 }
+
+describe('/schedules/:scheduleId?edit=1', () => {
+  before(() => {
+    passportStub.install(app);
+    passportStub.login({ id: 0, username: 'testuser' });
+  });
+
+  after(() => {
+    passportStub.logout();
+    passportStub.uninstall(app);
+  });
+
+  it('予定が更新でき、候補が追加できる', (done) => {
+    User.upsert({ userId: 0, username: 'testuser' }).then(() => {
+      request(app)
+        .post(`/schedules`)
+        .send({ scheduleName: 'テスト更新予定1', memo: 'テスト更新メモ1', candidates: 'テスト更新候補1' })
+        .end((err, res) => {
+          const createdSchedulePath = res.headers.location;
+          const scheduleId = createdSchedulePath.split('/schedules/')[1];
+          // 更新がされることをテスト
+          request(app)
+            .post(`/schedules/${scheduleId}?edit=1`)
+            .send({ scheduleName: 'テスト更新予定2', memo: 'テスト更新メモ2', candidates: 'テスト更新候補2' })
+            .end((err, res) => {
+              Schedule.findById(scheduleId).then((s) => {
+                assert.equal(s.scheduleName, 'テスト更新予定2');
+                assert.equal(s.memo, 'テスト更新メモ2');
+              });
+              Candidate.findAll({
+                where: { scheduleId: scheduleId }
+              }).then((candidates) => {
+                assert.equal(candidates.length, 2);
+                assert.equal(candidates[0].candidateName, 'テスト更新候補1');
+                assert.equal(candidates[1].candidateName, 'テスト更新候補2');
+                deleteScheduleAggregate(scheduleId, done, err);
+              })
+            })
+        })
+
+    })
+  })
+})
