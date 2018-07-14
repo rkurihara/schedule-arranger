@@ -10467,6 +10467,10 @@ global.jQuery = _jquery2.default;
       button.data('availability', data.availability);
       var availabilityLabels = ['欠', '?', '出'];
       button.text(availabilityLabels[data.availability]);
+
+      var buttonStyles = ['btn-danger', 'btn-default', 'btn-success'];
+      button.removeClass('btn-danger btn-default btn-success');
+      button.addClass(buttonStyles[data.availability]);
     });
   });
 });
