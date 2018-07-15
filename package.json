@@ -10,6 +10,7 @@
     "body-parser": "~1.18.2",
     "bootstrap": "^4.0.0",
     "cookie-parser": "~1.4.3",
+    "csurf": "^1.8.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
     "express-session": "^1.13.0",
